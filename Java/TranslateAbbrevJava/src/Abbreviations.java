@@ -3,25 +3,30 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class Abbreviations {
 	private static HashMap<String, String> translations = new HashMap<>();
-	// private static TreeMap<String, String> translations = new TreeMap<>();
 	private static ArrayList<String> data = new ArrayList<>();
 	private static ArrayList<Integer> nVals = new ArrayList<>();
 	private static ArrayList<Long> tVals = new ArrayList<>();
 	private static ArrayList<String> runData = new ArrayList<>();
 
+	/*
+	 * This program reads a dictionary of abbreviations and their translations 
+	 * from a CSV file and stores it in a HashMap. The program then loops through
+	 * the data (in this case content.csv) and translates the abbreviations and
+	 * acronyms in each string into their full words.
+	 */
 	public static void main(String[] args) {
-		loadWordsFromCSV("processed_abbreviations.csv");
-		loadDataFromCSV("content.csv");
+		loadWordsFromCSV("processed_abbreviations.csv"); // Loads translation dictionary
+		loadDataFromCSV("content.csv"); // Loads data to be translated
 		int maxN = data.size();
 		int N = 1;
 
+		// Loops through the data at increasing N values to determine time complexity
 		while (N < maxN) {
 			runData.clear();
 			nVals.add(N);
@@ -31,6 +36,8 @@ public class Abbreviations {
 			tVals.add(end - start);
 			N += 50000;
 			System.out.println("Run done");
+
+			// Writes the translated data at this iteration to view results
 			if (N == 100001) {
 				FileWriter fw;
 				try {
@@ -45,6 +52,7 @@ public class Abbreviations {
 				}
 			}
 		}
+		// Prints the n and time values to the console so they can be graphed
 		String nV = "";
 		String tV = "";
 		for (int i = 0; i < nVals.size(); i++) {
@@ -60,17 +68,19 @@ public class Abbreviations {
 		System.out.println("T: " + tV);
 	}
 
+	// Function that runs the N times to translate the data
 	private static void run_N_times(int N) {
 		for (int i = 0; i <= N; i++) {
 			String text = data.get(i);
-			runData.add(translateText(text));
+			runData.add(translateText(text)); 
 		}
 	}
 
-	private static void loadDataFromCSV(String fileName) // loads the comma-separated values into the class variable
-															// 'translations'
-															// 'translations' is a HashMap, where: the key is the word,
-															// and the value is the definition of the word.
+	// loads the comma-separated values into the class variable
+	// 'translations'
+	// 'translations' is a HashMap, where: the key is the word,
+	// and the value is the definition of the word.
+	private static void loadDataFromCSV(String fileName)
 	{
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
@@ -83,10 +93,11 @@ public class Abbreviations {
 		}
 	}
 
-	private static void loadWordsFromCSV(String fileName) // loads the comma-separated values into the class variable
-															// 'translations'
-															// 'translations' is a HashMap, where: the key is the word,
-															// and the value is the definition of the word.
+	// loads the comma-separated values into the class variable
+	// 'translations'
+	// 'translations' is a HashMap, where: the key is the word,
+	// and the value is the definition of the word.
+	private static void loadWordsFromCSV(String fileName)
 	{
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
@@ -100,22 +111,22 @@ public class Abbreviations {
 		}
 	}
 
+	// Translates abbreviations and acronyms into full words
 	private static String translateText(String text) {
-		// String[] words = text.split("[!._,@? ]");
-		// List<String> words = new ArrayList<>();
-		// words.addAll(Arrays.asList(text.split("[!._,@? ]")));
-		// List<String> words = Arrays.asList(text.split("[!._,@? ]"));
+		
+		// Store individual words in a HashSet to prevent duplicates
 		HashSet<String> words = new HashSet<>(Arrays.asList(text.split("[!._,@? ]")));
 
+		// Loop through each word in the HashSet
 		for (String word : words) {
 			String wordLC = word.toLowerCase();
 			String translation = translations.get(wordLC);
-			if (translation != null) {
+			if (translation != null) { // If the word is in the HashMap, replace it with the translation
 
-				text = text.replaceAll("(?i)\\b" + word + "\\b", translation);
+				text = text.replaceAll("(?i)\\b" + word + "\\b", translation); 
 			}
 		}
 
-		return text;
+		return text; // Return the translated text
 	}
 }
